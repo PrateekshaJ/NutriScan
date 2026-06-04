@@ -18,3 +18,5 @@ Pillow>=10.0.0
 # Training & notebooks (optional but recommended)
 matplotlib>=3.7.0
 jupyter>=1.0.0
+tensorflow
+pillow

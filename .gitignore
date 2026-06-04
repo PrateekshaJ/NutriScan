@@ -30,3 +30,16 @@ Thumbs.db
 
 # Streamlit
 .streamlit/secrets.toml
+# datasets
+food_images/
+data/train/
+data/val/
+*.zip
+
+# python
+venv/
+__pycache__/
+*.pyc
+
+# cache
+.cache/

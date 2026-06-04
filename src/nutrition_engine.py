@@ -9,11 +9,15 @@ class NutritionAnalyzer:
             "data/nutrition_db.csv"
         )
 
-        # remove csv index junk
+
+        # remove useless columns
         self.data = self.data.loc[
             :,
-            ~self.data.columns.str.contains("^Unnamed")
+            ~self.data.columns.str.contains(
+                "Unnamed"
+            )
         ]
+
 
         self.data.columns = (
             self.data.columns
@@ -26,19 +30,25 @@ class NutritionAnalyzer:
 
         food_name = food_name.lower()
 
-        result = self.data[
+
+        results = self.data[
             self.data["food"]
             .str.lower()
-            .str.contains(food_name, na=False)
+            .str.contains(
+                food_name,
+                na=False
+            )
         ]
 
-        if len(result) == 0:
-            return None
 
-        return result.iloc[0]
+        return results
 
 
-    def health_score(self, food):
+
+    def calculate_health_score(
+        self,
+        food
+    ):
 
         score = 100
 
@@ -48,60 +58,48 @@ class NutritionAnalyzer:
             0
         )
 
-        sugar = food.get(
-            "sugars",
-            0
-        )
 
         fat = food.get(
             "fat",
             0
         )
 
-        protein = food.get(
-            "protein",
+
+        sugar = food.get(
+            "sugars",
             0
         )
 
 
-        # simple AI scoring logic
-        if calories > 500:
+        if calories > 300:
             score -= 20
 
-        if sugar > 30:
+
+        if fat > 15:
             score -= 20
 
-        if fat > 20:
-            score -= 15
 
-        if protein > 10:
-            score += 10
+        if sugar > 20:
+            score -= 20
 
 
-        score = max(
-            0,
-            min(
-                100,
-                score
-            )
-        )
-
-        return round(
+        return max(
             score,
-            2
+            0
         )
 
 
-    def recommendation(self, score):
+
+    def recommendation(
+        self,
+        score
+    ):
 
         if score >= 80:
-
             return "Excellent choice 🥦🔥"
 
         elif score >= 50:
-
             return "Balanced choice 👍"
 
         else:
-
-            return "Consume occasionally 🍟"
+            return "Eat occasionally 🍟"

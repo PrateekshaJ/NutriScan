@@ -1,6 +1,7 @@
 import streamlit as st
 import sys
 import os
+from PIL import Image
 
 
 sys.path.append(
@@ -14,6 +15,7 @@ sys.path.append(
 
 
 from src.nutrition_engine import NutritionAnalyzer
+from src.food_detector import FoodDetector
 
 
 st.set_page_config(
@@ -24,6 +26,7 @@ st.set_page_config(
 
 
 engine = NutritionAnalyzer()
+detector = FoodDetector()
 
 
 st.title("NutriScan 🥗")
@@ -33,97 +36,177 @@ st.write(
 )
 
 
-food = st.text_input(
-    "Search your food 🍎"
+# IMPORTANT
+selected = None
+
+
+tab1, tab2 = st.tabs(
+    [
+        "🔍 Search Food",
+        "📸 Scan Food"
+    ]
 )
 
 
-if food:
+# ---------------- SEARCH FOOD ---------------- #
 
-    selected = engine.find_food(food)
+with tab1:
+
+    food = st.text_input(
+        "Search your food 🍎"
+    )
 
 
-    if selected is None:
+    if food:
 
-        st.error(
-            "Food not found 😭"
+        results = engine.find_food(
+            food
         )
 
 
-    else:
+        if len(results) == 0:
 
-        st.subheader(
-            selected["food"]
-        )
-
-
-        col1, col2, col3 = st.columns(3)
-
-
-        with col1:
-            st.metric(
-                "Protein 💪",
-                f"{selected.get('protein',0):.2f} g"
+            st.error(
+                "Food not found 😭"
             )
-
-
-        with col2:
-            st.metric(
-                "Fat 🧈",
-                f"{selected.get('fat',0):.2f} g"
-            )
-
-
-        with col3:
-            st.metric(
-                "Calories 🔥",
-                f"{selected.get('caloric_value',0):.0f}"
-            )
-
-
-        score = engine.health_score(
-            selected
-        )
-
-
-        st.metric(
-            "Health Score 🥗",
-            f"{score}/100"
-        )
-
-
-        message = engine.recommendation(
-            score
-        )
-
-
-        if score >= 80:
-            st.success(message)
-
-        elif score >= 50:
-            st.info(message)
 
         else:
-            st.warning(message)
+
+            selected = results.iloc[0]
 
 
-        st.divider()
+
+# ---------------- IMAGE DETECTION ---------------- #
+
+with tab2:
+
+    image_file = st.file_uploader(
+        "Upload food image 📸",
+        type=[
+            "jpg",
+            "jpeg",
+            "png"
+        ]
+    )
 
 
-        st.subheader(
-            "Complete Nutrition Data"
+    if image_file:
+
+        img = Image.open(
+            image_file
+        ).convert(
+            "RGB"
         )
 
 
-        clean_data = selected.drop(
-            labels=[
-                x for x in selected.index
-                if "unnamed" in x.lower()
-            ],
-            errors="ignore"
+        st.image(
+            img,
+            width=300
         )
 
 
-        st.dataframe(
-            clean_data.to_frame("value")
+        food_name, confidence = detector.predict(
+            img
         )
+
+
+        st.success(
+            f"Detected: {food_name} 🥗 ({confidence}%)"
+        )
+
+
+        food_name = food_name.replace(
+            "_",
+            " "
+        )
+
+
+        results = engine.find_food(
+            food_name
+        )
+
+
+        if len(results) == 0:
+
+            st.warning(
+                "Nutrition data unavailable 😭"
+            )
+
+        else:
+
+            selected = results.iloc[0]
+
+
+
+# ---------------- SHOW RESULT ---------------- #
+
+if selected is not None:
+
+
+    st.divider()
+
+
+    st.subheader(
+        selected["food"]
+    )
+
+
+    col1, col2, col3 = st.columns(3)
+
+
+    with col1:
+
+        st.metric(
+            "Protein 💪",
+            f'{selected.get("protein",0)} g'
+        )
+
+
+    with col2:
+
+        st.metric(
+            "Fat 🧈",
+            f'{selected.get("fat",0)} g'
+        )
+
+
+    with col3:
+
+        st.metric(
+            "Calories 🔥",
+            selected.get(
+                "caloric_value",
+                0
+            )
+        )
+
+
+    score = engine.calculate_health_score(
+        selected
+    )
+
+
+    st.metric(
+        "Health Score 🥗",
+        f"{score}/100"
+    )
+
+
+    st.success(
+        engine.recommendation(
+            score
+        )
+    )
+
+
+    st.divider()
+
+
+    st.subheader(
+        "Complete Nutrition Data"
+    )
+
+
+    st.dataframe(
+        selected
+    )

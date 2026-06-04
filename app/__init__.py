@@ -1,0 +1,1 @@
+"""NutriScan Streamlit application package."""

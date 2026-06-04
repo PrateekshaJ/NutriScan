@@ -1,0 +1,20 @@
+# NutriScan — core dependencies
+# Python 3.10+ recommended
+
+# Deep learning & vision
+tensorflow>=2.15.0,<2.19.0
+opencv-python-headless>=4.8.0
+
+# Data & ML
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Dashboard & visualization
+streamlit>=1.28.0
+plotly>=5.18.0
+Pillow>=10.0.0
+
+# Training & notebooks (optional but recommended)
+matplotlib>=3.7.0
+jupyter>=1.0.0

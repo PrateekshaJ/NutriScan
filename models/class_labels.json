@@ -1,0 +1,21 @@
+{
+  "classes": [
+    "apple",
+    "banana",
+    "pizza",
+    "burger",
+    "salad",
+    "pasta",
+    "rice_bowl",
+    "grilled_chicken",
+    "fries",
+    "ice_cream",
+    "sushi",
+    "sandwich",
+    "steak",
+    "soup",
+    "yogurt"
+  ],
+  "version": "1.0.0",
+  "description": "Food classes aligned with data/nutrition_db.csv. Update when retraining."
+}

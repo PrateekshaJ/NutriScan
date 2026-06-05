@@ -7,9 +7,9 @@ class FoodDetector:
 
     def __init__(self):
 
-        self.model = tf.keras.models.load_model(
-    "models/food_classifier.keras",
-    compile=False
+     self.model = tf.keras.layers.TFSMLayer(
+    "models/food_classifier_fixed",
+    call_endpoint="serve"
 )
 
         with open(

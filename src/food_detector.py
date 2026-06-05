@@ -7,52 +7,48 @@ class FoodDetector:
 
     def __init__(self):
 
-     self.model = tf.keras.layers.TFSMLayer(
-    "models/food_classifier_fixed",
-    call_endpoint="serve"
-)
+        self.model = tf.keras.layers.TFSMLayer(
+            "models/food_classifier_fixed",
+            call_endpoint="serve"
+        )
 
-        with open(
-            "models/class_labels.json"
-        ) as f:
+        with open("models/class_labels.json") as f:
             self.labels = json.load(f)
 
 
     def predict(self, image):
 
-        # convert every image to RGB
+        # convert image to RGB
         img = image.convert("RGB")
 
-        img = img.resize(
-            (224, 224)
-        )
+        # resize for model
+        img = img.resize((224, 224))
 
-        arr = tf.keras.utils.img_to_array(
-            img
-        )
+        # image to array
+        arr = tf.keras.utils.img_to_array(img)
 
-        # same scaling as training
+        # normalize
         arr = arr / 255.0
 
-        arr = np.expand_dims(
-            arr,
-            axis=0
+        # add batch dimension
+        arr = np.expand_dims(arr, axis=0)
+
+        # run model
+        prediction = self.model(arr)
+
+        # tensor -> numpy
+        prediction = prediction.numpy()
+
+        index = np.argmax(prediction)
+
+        confidence = round(
+            float(prediction[0][index]) * 100,
+            2
         )
 
-        prediction = self.model.predict(
-            arr
-        )
+        if isinstance(self.labels, dict):
+            food = self.labels[str(index)]
+        else:
+            food = self.labels[index]
 
-        index = np.argmax(
-            prediction
-        )
-
-        return (
-            self.labels[str(index)] if isinstance(self.labels, dict)
-            else self.labels[index],
-
-            round(
-                float(prediction[0][index]) * 100,
-                2
-            )
-        )
+        return food, confidence

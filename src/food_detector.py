@@ -8,8 +8,9 @@ class FoodDetector:
     def __init__(self):
 
         self.model = tf.keras.models.load_model(
-            "models/food_classifier.keras"
-        )
+    "models/food_classifier.keras",
+    compile=False
+)
 
         with open(
             "models/class_labels.json"

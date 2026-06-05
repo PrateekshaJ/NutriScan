@@ -1,6 +1,7 @@
 # NutriScan
 
 **AI-powered food intelligence and nutrition analysis platform.**
+**Live Demo**: https://nutriscan-kuf6.onrender.com/
 
 NutriScan combines computer vision, nutrition databases, health scoring, and ML-based recommendations in a modern Streamlit dashboard.
 
